@@ -2,7 +2,6 @@ package registry
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -63,7 +62,7 @@ func writeTempCerts(t *testing.T) (string, string, string) {
 }
 
 func TestInit(t *testing.T) {
-	f, err := ioutil.TempFile("/tmp/", "registry-test")
+	f, err := os.CreateTemp("/tmp/", "registry-test")
 	if err != nil {
 		log.Print(err.Error())
 		t.FailNow()
