@@ -1,7 +1,11 @@
 package registry
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"net/http"
+	"os"
 
 	"github.com/google/uuid"
 )
@@ -27,9 +31,47 @@ func (tc *TokenConfiguration) GenerateId() string {
 }
 
 type TLSConfig struct {
-	Enabled  bool   `yaml:"enabled"`
-	CertPath string `yaml:"cert_path"`
-	KeyPath  string `yaml:"key_path"`
+	Enabled               bool   `yaml:"enabled"`
+	CertPath              string `yaml:"cert_path"`
+	KeyPath               string `yaml:"key_path"`
+	CaPath                string `yaml:"ca_path"`
+	InsecureSkipTLSVerify bool   `yaml:"insecure_skip_tls_verify"`
+}
+
+func (cfg *TLSConfig) TLSConfig() (*tls.Config, error) {
+	if !cfg.Enabled {
+		return nil, nil
+	}
+	defaultConfig := &tls.Config{}
+	if transport, ok := http.DefaultTransport.(*http.Transport); ok {
+		if transport.TLSClientConfig != nil {
+			defaultConfig = transport.TLSClientConfig
+		}
+	}
+
+	cert, err := tls.LoadX509KeyPair(cfg.CertPath, cfg.KeyPath)
+	if err != nil {
+		return nil, err
+	}
+	defaultConfig.Certificates = append(defaultConfig.Certificates, cert)
+
+	if cfg.CaPath != "" {
+		caCert, err := os.ReadFile(cfg.CaPath)
+		if err != nil {
+			return nil, err
+		}
+
+		if defaultConfig.RootCAs == nil {
+			defaultConfig.RootCAs = x509.NewCertPool()
+		}
+		defaultConfig.RootCAs.AppendCertsFromPEM(caCert)
+	}
+
+	defaultTLSConfig := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		InsecureSkipVerify: cfg.InsecureSkipTLSVerify,
+	}
+	return defaultTLSConfig, nil
 }
 
 type Auth struct {
@@ -46,9 +88,14 @@ type Server struct {
 	Name  string                 `yaml:"name"`
 	Host  string                 `yaml:"host"`
 	Port  int                    `yaml:"port"`
-	TLS   TLSConfig              `yaml:"tls"`
+	TLS   *TLSConfig             `yaml:"tls,omitempty"`
 	Auth  Auth                   `yaml:"auth"`
 	Extra map[string]interface{} `yaml:"extra"`
+}
+
+type Database struct {
+	Server   `yaml:",inline"`
+	Database string `yaml:"database"`
 }
 
 type MessageBroker struct {
@@ -65,7 +112,7 @@ type Registry struct {
 	Kafka              *MessageBroker     `yaml:"kafka,omitempty"`
 	Nats               *MessageBroker     `yaml:"nats,omitempty"`
 
-	Redis    *Server `yaml:"redis,omitempty"`
-	Postgres *Server `yaml:"postgres,omitempty"`
-	Mongo    *Server `yaml:"mongo,omitempty"`
+	Redis    *Database `yaml:"redis,omitempty"`
+	Postgres *Database `yaml:"postgres,omitempty"`
+	Mongo    *Database `yaml:"mongo,omitempty"`
 }
