@@ -11,7 +11,7 @@ import (
 )
 
 type TokenConfiguration struct {
-	Audience                string  `yaml:"audience"`
+	Audience                []string  `yaml:"audience"`
 	Issuer                  string  `yaml:"issuer"`
 	IdGenType               string  `yaml:"id_gen_type"`
 	ValidityDurationSeconds float64 `yaml:"validity_duration_seconds"`
