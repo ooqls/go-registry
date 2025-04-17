@@ -29,6 +29,50 @@ func Get() *Registry {
 	return r
 }
 
+func InitLocalhost() {
+	m.Lock()
+	defer m.Unlock()
+
+	rlocalhost := Registry{
+		Kafka: &MessageBroker{
+			Server: Server{
+				Host: "localhost",
+				Port: 9092,
+			},
+		},
+		Nats: &MessageBroker{
+			Server: Server{
+				Host: "localhost",
+				Port: 4222,
+			},
+		},
+		Redis: &Database{
+			Server: Server{
+				Host: "localhost",
+				Port: 6379,
+			},
+		},
+		Postgres: &Database{
+			Server: Server{
+				Host: "localhost",
+				Port: 5432,
+				Auth: Auth{
+					Enabled: true,
+					Username: "postgres",
+					Password: "postgres",
+				},
+			},
+		},
+		Mongo: &Database{
+			Server: Server{
+				Host: "localhost",
+				Port: 27017,
+			},
+		},
+	}
+	r = &rlocalhost
+}
+
 func InitDefault() error {
 	m.Lock()
 	defer m.Unlock()
