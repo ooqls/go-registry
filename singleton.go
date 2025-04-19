@@ -51,23 +51,26 @@ func InitLocalhost() {
 				Host: "localhost",
 				Port: 6379,
 			},
+			Database: "0",
 		},
 		Postgres: &Database{
 			Server: Server{
 				Host: "localhost",
 				Port: 5432,
 				Auth: Auth{
-					Enabled: true,
+					Enabled:  true,
 					Username: "postgres",
 					Password: "postgres",
 				},
 			},
+			Database: "postgres",
 		},
 		Mongo: &Database{
 			Server: Server{
 				Host: "localhost",
 				Port: 27017,
 			},
+			Database: "mongo",
 		},
 	}
 	r = &rlocalhost
