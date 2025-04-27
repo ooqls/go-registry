@@ -9,12 +9,6 @@ import (
 
 func main() {
 	r := registry.Registry{
-		TokenConfiguration: registry.TokenConfiguration{
-			Audience:                []string{"audience1"},
-			Issuer:                  "issuer",
-			IdGenType:               "uuid",
-			ValidityDurationSeconds: 3600,
-		},
 		Kafka: &registry.MessageBroker{
 			Server: registry.Server{
 				Name: "kafka",

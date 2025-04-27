@@ -6,29 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"github.com/google/uuid"
 )
-
-type TokenConfiguration struct {
-	Audience                []string  `yaml:"audience"`
-	Issuer                  string  `yaml:"issuer"`
-	IdGenType               string  `yaml:"id_gen_type"`
-	ValidityDurationSeconds float64 `yaml:"validity_duration_seconds"`
-}
-
-func (tc *TokenConfiguration) GenerateId() string {
-	defaultIdGen := uuid.NewString
-	var id string
-	switch tc.IdGenType {
-	case "uuid":
-		id = uuid.NewString()
-	default:
-		id = defaultIdGen()
-	}
-
-	return id
-}
 
 type TLSConfig struct {
 	Enabled               bool   `yaml:"enabled"`
@@ -108,7 +86,7 @@ func (s *Server) GetConnectionString() string {
 }
 
 type Registry struct {
-	TokenConfiguration TokenConfiguration `yaml:"token_configuration"`
+
 	Kafka              *MessageBroker     `yaml:"kafka,omitempty"`
 	Nats               *MessageBroker     `yaml:"nats,omitempty"`
 
