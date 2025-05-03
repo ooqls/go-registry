@@ -65,6 +65,17 @@ func InitLocalhost() {
 			},
 			Database: "postgres",
 		},
+		Elasticsearch: &Database{
+			Server: Server{
+				Host: "localhost",
+				Port: 9200,
+				Auth: Auth{
+					Enabled:  true,
+					Username: "elastic",
+					Password: "elastic",
+				},
+			},
+		},
 		Mongo: &Database{
 			Server: Server{
 				Host: "localhost",

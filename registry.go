@@ -86,11 +86,11 @@ func (s *Server) GetConnectionString() string {
 }
 
 type Registry struct {
+	Kafka *MessageBroker `yaml:"kafka,omitempty"`
+	Nats  *MessageBroker `yaml:"nats,omitempty"`
 
-	Kafka              *MessageBroker     `yaml:"kafka,omitempty"`
-	Nats               *MessageBroker     `yaml:"nats,omitempty"`
-
-	Redis    *Database `yaml:"redis,omitempty"`
-	Postgres *Database `yaml:"postgres,omitempty"`
-	Mongo    *Database `yaml:"mongo,omitempty"`
+	Redis         *Database `yaml:"redis,omitempty"`
+	Postgres      *Database `yaml:"postgres,omitempty"`
+	Mongo         *Database `yaml:"mongo,omitempty"`
+	Elasticsearch *Database `yaml:"elasticsearch,omitempty"`
 }
