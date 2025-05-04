@@ -26,12 +26,18 @@ func (cfg *TLSConfig) TLSConfig() (*tls.Config, error) {
 			defaultConfig = transport.TLSClientConfig
 		}
 	}
+	if cfg.CertPath != "" && cfg.KeyPath != "" {
+		cert, err := tls.LoadX509KeyPair(cfg.CertPath, cfg.KeyPath)
+		if err != nil {
+			return nil, err
+		}
+		if defaultConfig.Certificates == nil {
+			defaultConfig.Certificates = make([]tls.Certificate, 0)
+		}
 
-	cert, err := tls.LoadX509KeyPair(cfg.CertPath, cfg.KeyPath)
-	if err != nil {
-		return nil, err
+		
+		defaultConfig.Certificates = append(defaultConfig.Certificates, cert)
 	}
-	defaultConfig.Certificates = append(defaultConfig.Certificates, cert)
 
 	if cfg.CaPath != "" {
 		caCert, err := os.ReadFile(cfg.CaPath)
@@ -45,11 +51,9 @@ func (cfg *TLSConfig) TLSConfig() (*tls.Config, error) {
 		defaultConfig.RootCAs.AppendCertsFromPEM(caCert)
 	}
 
-	defaultTLSConfig := &tls.Config{
-		Certificates:       []tls.Certificate{cert},
-		InsecureSkipVerify: cfg.InsecureSkipTLSVerify,
-	}
-	return defaultTLSConfig, nil
+	defaultConfig.InsecureSkipVerify = cfg.InsecureSkipTLSVerify
+
+	return defaultConfig, nil
 }
 
 type Auth struct {
